@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хвостатая аналитика — SQL, Python и Power BI для новичков</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F3FB; --ink: #2E2A3B;
+    --purple: #6F4FC3; --purple-soft: #EDE7FA;
+    --pink: #E8618C; --pink-soft: #FDEDF3;
+    --teal: #2FA786; --teal-soft: #E7F6F1;
+    --honey: #F2B705; --honey-soft: #FDF6E3;
+    --code-bg: #241C38; --code-text: #A6F0C6; --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+  body { font-family: "Rubik", system-ui, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.65; }
+  h1,h2,h3,.logo,.btn { font-family: "Nunito", system-ui, sans-serif; }
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(246,243,251,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid #E5DEF5;
+    display: flex; align-items: center; gap: 6px; padding: 10px 18px; flex-wrap: wrap;
+  }
+  .logo { font-weight: 900; color: var(--purple); font-size: 1.05em; margin-right: auto; display: flex; align-items: center; gap: 8px; }
+  nav a.nl { text-decoration: none; color: var(--ink); font-weight: 500; font-size: .9em; padding: 6px 12px; border-radius: 999px; }
+  nav a.nl:hover { background: var(--purple-soft); color: var(--purple); }
+  nav a.nl:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid var(--honey); outline-offset: 2px; }
+  .hero { max-width: 1020px; margin: 0 auto; padding: 56px 22px 40px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: center; }
+  .hero h1 { font-size: clamp(1.9em, 4.5vw, 3em); font-weight: 900; line-height: 1.12; }
+  .hero h1 .hl { color: var(--purple); }
+  .hero p.lead { margin: 14px 0 22px; font-size: 1.06em; color: #5A5470; }
+  .btn { display: inline-block; text-decoration: none; font-weight: 800; font-size: .95em; padding: 12px 22px; border-radius: 999px; margin: 0 10px 10px 0; transition: transform .15s ease, box-shadow .15s ease; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-p { background: var(--purple); color: #fff; box-shadow: 0 6px 18px rgba(111,79,195,.35); }
+  .btn-o { background: #fff; color: var(--purple); border: 2px solid var(--purple); }
+  .hero-art { text-align: center; }
+  .hero-art svg { width: 100%; max-width: 340px; }
+  section { max-width: 1020px; margin: 0 auto; padding: 44px 22px; }
+  .eyebrow { font-weight: 800; font-size: .78em; letter-spacing: .14em; text-transform: uppercase; }
+  .eyebrow.pu { color: var(--purple); } .eyebrow.pi { color: var(--pink); } .eyebrow.te { color: var(--teal); } .eyebrow.ho { color: #C8871A; }
+  h2.sec { font-size: 1.7em; font-weight: 900; margin: 6px 0 18px; }
+  .tracks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .track { background: var(--card); border-radius: 20px; padding: 22px; box-shadow: 0 4px 20px rgba(111,79,195,.08); text-decoration: none; color: var(--ink); border-top: 5px solid; transition: transform .15s ease; display: block; }
+  .track:hover { transform: translateY(-4px); }
+  .track h3 { font-size: 1.15em; font-weight: 800; margin: 10px 0 6px; }
+  .track p { font-size: .9em; color: #5A5470; }
+  .track .mini { font-size: .78em; font-weight: 600; margin-top: 10px; display: inline-block; }
+  .t-sql { border-color: var(--purple); } .t-sql .mini { color: var(--purple); }
+  .t-py { border-color: var(--honey); } .t-py .mini { color: #C8871A; }
+  .t-pbi { border-color: var(--teal); } .t-pbi .mini { color: var(--teal); }
+  .sandboxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .sand { background: var(--card); border-radius: 18px; padding: 18px 20px; box-shadow: 0 3px 16px rgba(46,42,59,.07); text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 6px; transition: transform .15s ease; }
+  .sand:hover { transform: translateY(-3px); }
+  .sand b { font-size: 1em; }
+  .sand span { font-size: .84em; color: #5A5470; }
+  .sand .go { font-weight: 800; font-size: .82em; margin-top: 4px; }
+  .s-pu .go { color: var(--purple); } .s-ho .go { color: #C8871A; } .s-te .go { color: var(--teal); } .s-pi .go { color: var(--pink); }
+  .bubble { display: flex; gap: 14px; align-items: flex-start; border: 2px dashed; border-radius: 18px; padding: 14px 16px; margin: 18px 0; }
+  .bubble svg { width: 60px; height: 60px; flex-shrink: 0; }
+  .bubble .who { font-weight: 700; font-size: .88em; }
+  .bubble .txt { font-size: .94em; }
+  .cat { background: var(--pink-soft); border-color: #FFB6C1; } .cat .who { color: var(--pink); }
+  .otter { background: var(--teal-soft); border-color: #7FD8BE; } .otter .who { color: var(--teal); }
+  .snake { background: var(--honey-soft); border-color: #F2C879; } .snake .who { color: #C8871A; }
+  .code { background: var(--code-bg); color: var(--code-text); font-family: Consolas, monospace; font-size: .86em; padding: 14px 18px; border-radius: 14px; margin: 12px 0; white-space: pre-wrap; overflow-x: auto; }
+  .code .cmt { color: #8B7FB0; }
+  details.ch { background: var(--card); border-radius: 16px; padding: 14px 20px; margin: 12px 0; box-shadow: 0 2px 12px rgba(111,79,195,.07); }
+  details.ch summary { cursor: pointer; font-family: "Nunito"; font-weight: 800; font-size: 1.02em; color: var(--purple); list-style: none; display: flex; align-items: center; gap: 10px; }
+  details.ch summary::before { content: "▸"; transition: transform .15s; color: var(--pink); }
+  details.ch[open] summary::before { transform: rotate(90deg); }
+  details.ch summary::-webkit-details-marker { display: none; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 8px rgba(111,79,195,.06); font-size: .87em; }
+  th { background: var(--purple); color: white; padding: 7px 12px; text-align: left; }
+  td { padding: 6px 12px; border-bottom: 1px solid #F0EBF8; }
+  tr:nth-child(even) td { background: #FAF7FE; }
+  table.cheat th { background: var(--pink); }
+  table.mini { width: auto; min-width: 45%; display: inline-table; margin-right: 3%; vertical-align: top; }
+  table.res th { background: var(--teal); }
+  .duo { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+  .duo > div { flex: 1; min-width: 240px; }
+  .lbl { font-size: .78em; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+  .lbl.was { color: #A79FC0; } .lbl.now { color: var(--teal); }
+  .c { font-family: Consolas, monospace; color: var(--purple); background: var(--purple-soft); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+  ul, ol { padding-left: 24px; margin: 8px 0; }
+  li { margin-bottom: 5px; }
+  .step { background: #fff; border-left: 4px solid var(--teal); border-radius: 0 12px 12px 0; padding: 10px 16px; margin: 10px 0; box-shadow: 0 1px 6px rgba(47,167,134,.08); font-size: .95em; }
+  .step b { color: var(--teal); }
+  .warn { background: var(--pink-soft); border-left: 4px solid var(--pink); border-radius: 0 12px 12px 0; padding: 10px 16px; margin: 14px 0; font-size: .95em; }
+  .warn b { color: var(--pink); }
+  .why { background: var(--honey-soft); border-left: 4px solid var(--honey); border-radius: 0 12px 12px 0; padding: 10px 16px; margin: 14px 0; font-size: .93em; }
+  .why b { color: #C8871A; }
+  h3.sub { font-size: 1.02em; font-weight: 800; color: var(--ink); margin: 18px 0 6px; }
+  .footer { text-align: center; color: #A79FC0; padding: 40px 20px 60px; font-size: .9em; }
+  .pawline { text-align: center; font-size: 1.2em; letter-spacing: 12px; color: #D9CBF2; margin: 8px 0; }
+  @media (max-width: 760px) {
+    .hero { grid-template-columns: 1fr; text-align: center; padding-top: 36px; }
+    .hero-art { order: -1; }
+    .tracks { grid-template-columns: 1fr; }
+    nav { padding: 8px 12px; }
+    nav a.nl { font-size: .82em; padding: 5px 9px; }
+    table.mini { width: 100%; display: table; margin-right: 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">
+    <svg width="26" height="26" viewBox="0 0 100 100"><circle cx="50" cy="58" r="30" fill="#F9A03F"/><polygon points="26,42 22,12 46,36" fill="#F9A03F"/><polygon points="74,42 78,12 54,36" fill="#F9A03F"/><circle cx="40" cy="55" r="4" fill="#2E2A3B"/><circle cx="60" cy="55" r="4" fill="#2E2A3B"/><polygon points="50,63 46,68 54,68" fill="#FF8FAB"/></svg>
+    Хвостатая аналитика
+  </span>
+  <a class="nl" href="#start">Старт</a>
+  <a class="nl" href="#sql">SQL</a>
+  <a class="nl" href="#py">Python</a>
+  <a class="nl" href="#pbi">Power BI</a>
+  <a class="nl" href="#sand">Песочницы</a>
+</nav>
+
+<div class="hero">
+  <div>
+    <h1>Аналитика с нуля —<br>объясняют <span class="hl">коты</span>, выдра и одна змейка</h1>
+    <p class="lead">SQL, Python и Power BI для тех, кто никогда не писал ни строчки кода. Каждая тема — по схеме «было → запрос → стало», чтобы видеть, что именно происходит с данными.</p>
+    <a class="btn btn-p" href="#start">Начать с нуля</a>
+    <a class="btn btn-o" href="#sand">Открыть песочницы</a>
+  </div>
+  <div class="hero-art">
+    <svg viewBox="0 0 220 150">
+      <ellipse cx="60" cy="105" rx="38" ry="30" fill="#F9A03F"/>
+      <circle cx="60" cy="62" r="30" fill="#F9A03F"/>
+      <polygon points="35,45 30,15 55,38" fill="#F9A03F"/>
+      <polygon points="85,45 90,15 65,38" fill="#F9A03F"/>
+      <polygon points="38,42 35,24 52,39" fill="#FFC9DE"/>
+      <polygon points="82,42 85,24 68,39" fill="#FFC9DE"/>
+      <circle cx="50" cy="60" r="4.5" fill="#2E2A3B"/><circle cx="70" cy="60" r="4.5" fill="#2E2A3B"/>
+      <circle cx="51.5" cy="58.5" r="1.5" fill="#fff"/><circle cx="71.5" cy="58.5" r="1.5" fill="#fff"/>
+      <polygon points="60,68 56,73 64,73" fill="#FF8FAB"/>
+      <path d="M60 73 Q55 79 49 76" stroke="#2E2A3B" stroke-width="1.6" fill="none"/>
+      <path d="M60 73 Q65 79 71 76" stroke="#2E2A3B" stroke-width="1.6" fill="none"/>
+      <ellipse cx="138" cy="108" rx="26" ry="27" fill="#8B6647"/>
+      <ellipse cx="138" cy="116" rx="16" ry="16" fill="#C9A87F"/>
+      <circle cx="138" cy="78" r="21" fill="#8B6647"/>
+      <ellipse cx="138" cy="86" rx="13" ry="10" fill="#C9A87F"/>
+      <circle cx="120" cy="64" r="6" fill="#8B6647"/><circle cx="156" cy="64" r="6" fill="#8B6647"/>
+      <circle cx="131" cy="75" r="3.5" fill="#2E2A3B"/><circle cx="145" cy="75" r="3.5" fill="#2E2A3B"/>
+      <ellipse cx="138" cy="83" rx="4" ry="3" fill="#2E2A3B"/>
+      <path d="M138 86 Q135 91 131 89" stroke="#2E2A3B" stroke-width="1.4" fill="none"/>
+      <path d="M138 86 Q141 91 145 89" stroke="#2E2A3B" stroke-width="1.4" fill="none"/>
+      <path d="M175 112 Q185 72 205 87 Q219 98 207 106 Q197 112 201 94" stroke="#7BB661" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <circle cx="204" cy="90" r="7" fill="#7BB661"/>
+      <circle cx="202" cy="88" r="1.5" fill="#2E2A3B"/><circle cx="207" cy="88" r="1.5" fill="#2E2A3B"/>
+      <path d="M202 93 Q204.5 95 207 93" stroke="#2E2A3B" stroke-width="1.2" fill="none"/>
+    </svg>
+  </div>
+</div>
+
+<section>
+  <div class="eyebrow pu">Три трека</div>
+  <h2 class="sec">Что внутри</h2>
+  <div class="tracks">
+    <a class="track t-sql" href="#sql">
+      <svg width="42" height="42" viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#F9A03F"/><polygon points="26,38 22,10 46,32" fill="#F9A03F"/><polygon points="74,38 78,10 54,32" fill="#F9A03F"/><circle cx="40" cy="52" r="4" fill="#2E2A3B"/><circle cx="60" cy="52" r="4" fill="#2E2A3B"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/></svg>
+      <h3>SQL — язык баз данных</h3>
+      <p>От первого SELECT до оконных функций, которые спрашивают на каждом собеседовании. Ведёт кот Джойн.</p>
+      <span class="mini">9 глав + шпаргалка →</span>
+    </a>
+    <a class="track t-py" href="#py">
+      <svg width="42" height="42" viewBox="0 0 100 100"><path d="M20 80 Q30 40 55 55 Q75 68 62 78 Q50 84 55 65" stroke="#7BB661" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="56" cy="52" r="12" fill="#7BB661"/><circle cx="52" cy="49" r="2" fill="#2E2A3B"/><circle cx="61" cy="49" r="2" fill="#2E2A3B"/></svg>
+      <h3>Python — автоматизация</h3>
+      <p>Переменные, циклы и Pandas — Excel на стероидах. С мостиком «SQL → Python», чтобы не учить всё заново. Ведёт змейка Пандас.</p>
+      <span class="mini">4 главы + шпаргалка →</span>
+    </a>
+    <a class="track t-pbi" href="#pbi">
+      <svg width="42" height="42" viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#fff" stroke="#E0E0E0"/><polygon points="26,38 22,10 46,32" fill="#fff" stroke="#E0E0E0"/><polygon points="74,38 78,10 54,32" fill="#fff" stroke="#E0E0E0"/><circle cx="40" cy="52" r="4" fill="#5BA4E6"/><circle cx="60" cy="52" r="4" fill="#5BA4E6"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/></svg>
+      <h3>Power BI — дашборды</h3>
+      <p>Первый график по кликам: куда нажать и что перетащить. Меры, DAX и золотое правило пяти секунд. Ведёт кошка Дашборда.</p>
+      <span class="mini">7 глав + шпаргалка →</span>
+    </a>
+  </div>
+</section>
+
+<section id="start">
+  <div class="eyebrow te">Часть 0</div>
+  <h2 class="sec">С чего вообще начать</h2>
+
+  <div class="bubble cat">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#F9A03F"/><polygon points="26,38 22,10 46,32" fill="#F9A03F"/><polygon points="74,38 78,10 54,32" fill="#F9A03F"/><circle cx="40" cy="52" r="4" fill="#2E2A3B"/><circle cx="60" cy="52" r="4" fill="#2E2A3B"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/><path d="M50 65 Q45 71 39 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 65 Q55 71 61 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+    <div><div class="who">Кот Джойн приветствует:</div>
+    <div class="txt">Прежде чем писать код — разберёмся, ГДЕ его писать. Это вопрос, который все стесняются задать, а зря. Настроим всё за 10 минут, без установки сложных программ.</div></div>
+  </div>
+
+  <h3 class="sub">Что такое база данных — на пальцах</h3>
+  <p>Представь Excel-файл с несколькими листами, только очень большой и очень быстрый. Каждый «лист» — это <b>таблица</b>: столбцы (имя, город, сумма) и строки (записи). База данных — набор таких таблиц плюс программа, которая молниеносно по ним ищет. SQL — язык, на котором мы её просим.</p>
+
+  <h3 class="sub">Создай учебную базу (один раз)</h3>
+  <p>Открой песочницу <a href="https://sqliteonline.com" target="_blank" rel="noopener">sqliteonline.com</a>, слева выбери PostgreSQL, вставь код и нажми Run — появятся три таблицы зоомагазина, на которых построен весь курс:</p>
+  <div class="code">CREATE TABLE cats (id INT, name TEXT, city TEXT, fluff_level REAL);
+INSERT INTO cats VALUES
+  (1, 'Барсик', 'Питер', 4.5),
+  (2, 'Мурка', 'Москва', 3.8),
+  (3, 'Пушок', 'Питер', 4.9);
+
+CREATE TABLE orders (id INT, cat_id INT, amount INT, status TEXT, created_at DATE);
+INSERT INTO orders VALUES
+  (101, 1, 5000, 'paid', '2026-01-05'),
+  (102, 1, 3200, 'cancelled', '2026-01-07'),
+  (103, 2, 7800, 'paid', '2026-01-10'),
+  (104, 3, 1200, 'paid', '2026-02-01');
+
+CREATE TABLE payments (id INT, order_id INT, paid_amount INT, method TEXT);
+INSERT INTO payments VALUES
+  (1, 101, 5000, 'card'),
+  (2, 103, 7800, 'invoice');</div>
+
+  <p>Вот как выглядят наши таблицы — возвращайся к ним, читая примеры:</p>
+  <div class="duo">
+    <div>
+      <div class="lbl was">cats — коты-сотрудники</div>
+      <table><tr><th>id</th><th>name</th><th>city</th><th>fluff_level</th></tr>
+      <tr><td>1</td><td>Барсик</td><td>Питер</td><td>4.5</td></tr>
+      <tr><td>2</td><td>Мурка</td><td>Москва</td><td>3.8</td></tr>
+      <tr><td>3</td><td>Пушок</td><td>Питер</td><td>4.9</td></tr></table>
+    </div>
+    <div>
+      <div class="lbl was">orders — заказы на корм</div>
+      <table><tr><th>id</th><th>cat_id</th><th>amount</th><th>status</th></tr>
+      <tr><td>101</td><td>1</td><td>5000</td><td>paid</td></tr>
+      <tr><td>102</td><td>1</td><td>3200</td><td>cancelled</td></tr>
+      <tr><td>103</td><td>2</td><td>7800</td><td>paid</td></tr>
+      <tr><td>104</td><td>3</td><td>1200</td><td>paid</td></tr></table>
+    </div>
+  </div>
+
+  <div class="bubble otter">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="26" fill="#8B6647"/><ellipse cx="50" cy="62" rx="16" ry="13" fill="#C9A87F"/><circle cx="30" cy="34" r="7" fill="#8B6647"/><circle cx="70" cy="34" r="7" fill="#8B6647"/><circle cx="41" cy="48" r="4" fill="#2E2A3B"/><circle cx="59" cy="48" r="4" fill="#2E2A3B"/><ellipse cx="50" cy="58" rx="4.5" ry="3.5" fill="#2E2A3B"/><path d="M50 61 Q46 67 41 64" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 61 Q54 67 59 64" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+    <div><div class="who">Выдра Куэри делится фактом:</div>
+    <div class="txt">Выдры учат детёнышей плавать, просто таская их в воду — теория без практики у них не работает. С кодом так же: прочитала главу → сразу попробуй запрос в песочнице.</div></div>
+  </div>
+</section>
+
+<!-- ============ SQL ============ -->
+<section id="sql">
+  <div class="eyebrow pu">Часть I</div>
+  <h2 class="sec">SQL — язык, на котором мурчат базы данных</h2>
+
+  <details class="ch" open>
+    <summary>Глава 1. SELECT и WHERE — просим и фильтруем</summary>
+    <p>Запрос — это вопрос к таблице. Задаём:</p>
+    <div class="code">SELECT name, city FROM cats;</div>
+    <div class="duo">
+      <div><div class="lbl was">Было: cats (3 строки, 4 столбца)</div>
+      <table><tr><th>id</th><th>name</th><th>city</th><th>fluff_level</th></tr><tr><td>1</td><td>Барсик</td><td>Питер</td><td>4.5</td></tr><tr><td>2</td><td>Мурка</td><td>Москва</td><td>3.8</td></tr><tr><td>3</td><td>Пушок</td><td>Питер</td><td>4.9</td></tr></table></div>
+      <div><div class="lbl now">Стало: только 2 столбца</div>
+      <table class="res"><tr><th>name</th><th>city</th></tr><tr><td>Барсик</td><td>Питер</td></tr><tr><td>Мурка</td><td>Москва</td></tr><tr><td>Пушок</td><td>Питер</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> SELECT выбирает СТОЛБЦЫ. Строки не тронуты — их по-прежнему три. Все столбцы сразу — <span class="c">SELECT *</span>.</div>
+
+    <p>Теперь отфильтруем СТРОКИ:</p>
+    <div class="code">SELECT * FROM orders WHERE status = 'paid' AND amount &gt; 3000;</div>
+    <div class="duo">
+      <div><div class="lbl was">Было: orders (4 строки)</div>
+      <table><tr><th>id</th><th>amount</th><th>status</th></tr><tr><td>101</td><td>5000</td><td>paid</td></tr><tr><td>102</td><td>3200</td><td>cancelled</td></tr><tr><td>103</td><td>7800</td><td>paid</td></tr><tr><td>104</td><td>1200</td><td>paid</td></tr></table></div>
+      <div><div class="lbl now">Стало: 2 строки прошли оба условия</div>
+      <table class="res"><tr><th>id</th><th>amount</th><th>status</th></tr><tr><td>101</td><td>5000</td><td>paid</td></tr><tr><td>103</td><td>7800</td><td>paid</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> строка 102 отпала (cancelled), строка 104 отпала (1200 &lt; 3000). WHERE проверяет КАЖДУЮ строку: прошла условия — остаётся, нет — выкидывается.</div>
+
+    <h3 class="sub">Ещё операторы для WHERE</h3>
+    <ul>
+      <li><span class="c">IN</span> — список: <span class="c">WHERE city IN ('Питер', 'Москва')</span> — то же, что city='Питер' OR city='Москва'</li>
+      <li><span class="c">BETWEEN</span> — диапазон: <span class="c">WHERE amount BETWEEN 1000 AND 5000</span> (границы включаются)</li>
+      <li><span class="c">LIKE</span> — маска: <span class="c">WHERE name LIKE 'Б%'</span> — имена на «Б» (% — любое число символов, _ — ровно один)</li>
+      <li><span class="c">AS</span> — переименовать столбец в результате: <span class="c">SELECT name AS cat_name</span></li>
+      <li><span class="c">-- текст</span> — комментарий, база его не выполняет</li>
+    </ul>
+
+    <div class="bubble cat">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#B0B0B8"/><polygon points="26,38 22,10 46,32" fill="#B0B0B8"/><polygon points="74,38 78,10 54,32" fill="#B0B0B8"/><circle cx="40" cy="52" r="4" fill="#2E2A3B"/><circle cx="60" cy="52" r="4" fill="#2E2A3B"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/><path d="M50 65 Q45 71 39 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 65 Q55 71 61 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+      <div><div class="who">Кошка Селекта про NULL:</div>
+      <div class="txt">NULL — не ноль и не пустая строка, а «значения нет вообще». Как миска, в которую забыли насыпать корм: миска есть, корма — NULL. Сравнивать через <b>=</b> нельзя — только <span class="c">IS NULL</span> / <span class="c">IS NOT NULL</span>. Заменить NULL на что-то: <span class="c">COALESCE(fluff_level, 0)</span> — «если пусто, считай нулём».</div></div>
+    </div>
+
+    <h3 class="sub">ORDER BY и LIMIT — сортировка и «дай только N»</h3>
+    <div class="code">SELECT name, amount FROM orders ORDER BY amount DESC LIMIT 2;</div>
+    <div class="duo">
+      <div><div class="lbl now">Стало: отсортировано по убыванию, взяты первые 2</div>
+      <table class="res"><tr><th>id</th><th>amount</th></tr><tr><td>103</td><td>7800</td></tr><tr><td>101</td><td>5000</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> сначала все строки выстроились от большего к меньшему (<span class="c">DESC</span>), потом LIMIT отрезал всё после второй. Это и есть «топ-2 заказа».</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 2. Порядок выполнения — почему база «не видит» твой алиас</summary>
+    <p>Секрет, объясняющий половину «почему не работает»: база выполняет запрос НЕ в том порядке, в каком ты его пишешь.</p>
+    <table>
+      <tr><th>Порядок</th><th>Что делает</th></tr>
+      <tr><td>1. FROM</td><td>берёт таблицы, делает JOIN</td></tr>
+      <tr><td>2. WHERE</td><td>отсеивает строки</td></tr>
+      <tr><td>3. GROUP BY</td><td>группирует</td></tr>
+      <tr><td>4. HAVING</td><td>отсеивает группы</td></tr>
+      <tr><td>5. SELECT</td><td>выбирает столбцы, считает</td></tr>
+      <tr><td>6. ORDER BY</td><td>сортирует</td></tr>
+      <tr><td>7. LIMIT</td><td>обрезает</td></tr>
+    </table>
+    <div class="why"><b>Зачем это знать:</b> алиас из SELECT нельзя использовать в WHERE — когда WHERE работает (шаг 2), алиаса ещё не существует (он родится на шаге 5). А в ORDER BY (шаг 6) — можно, он уже есть!</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 3. GROUP BY — сворачиваем строки в итоги</summary>
+    <p>Вопрос: «сколько всего оплачено каждым котом?»</p>
+    <div class="code">SELECT cat_id, SUM(amount) AS total, COUNT(*) AS cnt
+FROM orders
+WHERE status = 'paid'
+GROUP BY cat_id;</div>
+    <div class="duo">
+      <div><div class="lbl was">Было: оплаченные заказы (после WHERE)</div>
+      <table><tr><th>cat_id</th><th>amount</th></tr><tr><td>1</td><td>5000</td></tr><tr><td>2</td><td>7800</td></tr><tr><td>3</td><td>1200</td></tr></table></div>
+      <div><div class="lbl now">Стало: одна строка на кота</div>
+      <table class="res"><tr><th>cat_id</th><th>total</th><th>cnt</th></tr><tr><td>1</td><td>5000</td><td>1</td></tr><tr><td>2</td><td>7800</td><td>1</td></tr><tr><td>3</td><td>1200</td><td>1</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> строки разложились по кучкам (кучка = одинаковый cat_id), и по каждой кучке посчитались SUM и COUNT. Каждая кучка стала ОДНОЙ строкой результата. Детали внутри кучки исчезли — остались только итоги.</div>
+    <p>Функции-счётчики: <span class="c">COUNT(*)</span> — сколько строк, <span class="c">COUNT(DISTINCT col)</span> — сколько разных значений, <span class="c">SUM / AVG / MIN / MAX</span>.</p>
+    <div class="warn"><b>Правило GROUP BY:</b> в SELECT можно писать только то, что есть в GROUP BY, или обёрнуто в функцию. Почему: после группировки «кучка» знает свой cat_id (он общий) и умеет считать итоги, но НЕ знает, какой конкретно amount показать — их там несколько! База честно отказывается угадывать и ругается.</div>
+    <h3 class="sub">HAVING — фильтр кучек</h3>
+    <div class="code">SELECT cat_id, SUM(amount) AS total
+FROM orders GROUP BY cat_id
+HAVING SUM(amount) &gt; 5000;</div>
+    <div class="why"><b>Разница с WHERE:</b> WHERE выкидывает СТРОКИ до группировки, HAVING выкидывает ГОТОВЫЕ КУЧКИ после. Здесь останется только кот 2 (7800) — у остальных итог меньше.</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 4. CASE WHEN — «если-то» прямо в запросе</summary>
+    <div class="code">SELECT id, amount,
+  CASE
+    WHEN amount &gt;= 5000 THEN 'крупный'
+    WHEN amount &gt;= 2000 THEN 'средний'
+    ELSE 'мелкий'
+  END AS order_size
+FROM orders;</div>
+    <div class="duo">
+      <div><div class="lbl now">Стало: новый столбец-категория</div>
+      <table class="res"><tr><th>id</th><th>amount</th><th>order_size</th></tr><tr><td>101</td><td>5000</td><td>крупный</td></tr><tr><td>102</td><td>3200</td><td>средний</td></tr><tr><td>103</td><td>7800</td><td>крупный</td></tr><tr><td>104</td><td>1200</td><td>мелкий</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> для каждой строки условия проверяются СВЕРХУ ВНИЗ, срабатывает первое подходящее. 3200 — это ≥2000, но не ≥5000, поэтому «средний». Ни одно не подошло — берётся ELSE. Одна из самых используемых конструкций в реальной работе!</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 5. Даты и текст</summary>
+    <div class="code"><span class="cmt">-- вытащить месяц из даты (PostgreSQL)</span>
+SELECT id, EXTRACT(MONTH FROM created_at) AS mon FROM orders;
+<span class="cmt">-- id=101 → mon=1, id=104 → mon=2</span>
+
+SELECT DATE_TRUNC('month', created_at) FROM orders;
+<span class="cmt">-- «обнуляет» дату до начала месяца: 2026-01-05 → 2026-01-01</span>
+
+<span class="cmt">-- текст</span>
+SELECT UPPER(name) FROM cats;          <span class="cmt">-- БАРСИК</span>
+SELECT LENGTH(name) FROM cats;         <span class="cmt">-- 6</span>
+SELECT CONCAT(name, ' из ', city) FROM cats;  <span class="cmt">-- Барсик из Питер</span></div>
+    <div class="why"><b>Зачем это:</b> в отчётах почти всегда группируют по месяцам — <span class="c">GROUP BY DATE_TRUNC('month', created_at)</span> — это стандартный приём «продажи по месяцам».</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 6. JOIN — склеиваем две таблицы в одну</summary>
+    <p>Проблема: в orders есть только cat_id (цифра), а имя кота лежит в другой таблице. JOIN приклеивает к каждой строке заказов данные её кота:</p>
+    <div class="code">SELECT o.id, o.amount, c.name
+FROM orders o
+LEFT JOIN cats c ON o.cat_id = c.id;</div>
+    <div class="duo">
+      <div><div class="lbl was">Было: две отдельные таблицы</div>
+      <table class="mini"><tr><th>id</th><th>cat_id</th><th>amount</th></tr><tr><td>101</td><td>1</td><td>5000</td></tr><tr><td>103</td><td>2</td><td>7800</td></tr></table>
+      <table class="mini"><tr><th>id</th><th>name</th></tr><tr><td>1</td><td>Барсик</td></tr><tr><td>2</td><td>Мурка</td></tr></table></div>
+      <div><div class="lbl now">Стало: одна широкая таблица</div>
+      <table class="res"><tr><th>id</th><th>amount</th><th>name</th></tr><tr><td>101</td><td>5000</td><td>Барсик</td></tr><tr><td>103</td><td>7800</td><td>Мурка</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> для каждой строки orders база нашла в cats строку с таким же id (условие <span class="c">ON o.cat_id = c.id</span> — «по какому столбцу склеивать») и дописала её столбцы справа. <span class="c">o</span> и <span class="c">c</span> — алиасы, короткие клички таблиц.</div>
+
+    <h3 class="sub">INNER vs LEFT — в чём разница</h3>
+    <p>Добавим в cats кота Рыжика (id=4), у которого нет ни одного заказа, и склеим наоборот — от котов к заказам:</p>
+    <div class="duo">
+      <div><div class="lbl now">INNER JOIN: только пары</div>
+      <table class="res"><tr><th>name</th><th>order_id</th></tr><tr><td>Барсик</td><td>101</td></tr><tr><td>Мурка</td><td>103</td></tr></table>
+      <p style="font-size:.85em; color:#5A5470">Рыжика нет — пары не нашлось.</p></div>
+      <div><div class="lbl now">LEFT JOIN: ВСЕ из левой + пары</div>
+      <table class="res"><tr><th>name</th><th>order_id</th></tr><tr><td>Барсик</td><td>101</td></tr><tr><td>Мурка</td><td>103</td></tr><tr><td>Рыжик</td><td>NULL</td></tr></table>
+      <p style="font-size:.85em; color:#5A5470">Рыжик остался, заказа нет → NULL.</p></div>
+    </div>
+    <div class="why"><b>Когда что:</b> LEFT JOIN — когда важно никого не потерять («покажи всех котов, даже безработных»). INNER — когда нужны только совпавшие. LEFT используется чаще. Кстати, «в результате стало БОЛЬШЕ строк, чем было» — это нормально: если у кота 2 заказа, его строка размножится на 2 (по строке на каждый заказ).</div>
+    <div class="bubble otter">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="26" fill="#8B6647"/><ellipse cx="50" cy="62" rx="16" ry="13" fill="#C9A87F"/><circle cx="30" cy="34" r="7" fill="#8B6647"/><circle cx="70" cy="34" r="7" fill="#8B6647"/><circle cx="41" cy="48" r="4" fill="#2E2A3B"/><circle cx="59" cy="48" r="4" fill="#2E2A3B"/><ellipse cx="50" cy="58" rx="4.5" ry="3.5" fill="#2E2A3B"/><path d="M50 61 Q46 67 41 64" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 61 Q54 67 59 64" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+      <div><div class="who">Выдра Куэри делится фактом:</div>
+      <div class="txt">У выдры есть любимый камень в кармашке под лапкой. У аналитика такой камень — LEFT JOIN: подходит почти для всего и всегда с собой. Три таблицы? Просто цепочка: второй JOIN приклеивается к результату первого.</div></div>
+    </div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 7. Подзапросы и CTE — запрос в запросе</summary>
+    <p>Задача: «заказы питерских котов». Решаем в два шага:</p>
+    <div class="code">WITH piter_cats AS (
+    SELECT id FROM cats WHERE city = 'Питер'
+)
+SELECT * FROM orders
+WHERE cat_id IN (SELECT id FROM piter_cats);</div>
+    <div class="duo">
+      <div><div class="lbl was">Шаг 1: piter_cats (временная табличка)</div>
+      <table><tr><th>id</th></tr><tr><td>1</td></tr><tr><td>3</td></tr></table></div>
+      <div><div class="lbl now">Шаг 2: заказы с cat_id из этого списка</div>
+      <table class="res"><tr><th>id</th><th>cat_id</th><th>amount</th></tr><tr><td>101</td><td>1</td><td>5000</td></tr><tr><td>102</td><td>1</td><td>3200</td></tr><tr><td>104</td><td>3</td><td>1200</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> <span class="c">WITH имя AS (...)</span> создаёт временную табличку, которая живёт только внутри этого запроса. Сложная задача разбивается на понятные шаги — вместо матрёшки из скобок. Это и называется CTE.</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 8. Оконные функции — считаем итог, не убивая детали</summary>
+    <p>Вспомни GROUP BY: он отвечает «сколько всего у каждого кота», но детали (отдельные заказы) исчезают. А что, если нужно И то И другое — каждый заказ + итог его кота рядом?</p>
+    <div class="code">SELECT cat_id, amount,
+  SUM(amount) OVER (PARTITION BY cat_id) AS cat_total
+FROM orders;</div>
+    <div class="duo">
+      <div><div class="lbl was">GROUP BY: 4 строки → 3, детали пропали</div>
+      <table><tr><th>cat_id</th><th>сумма</th></tr><tr><td>1</td><td>8200</td></tr><tr><td>2</td><td>7800</td></tr><tr><td>3</td><td>1200</td></tr></table></div>
+      <div><div class="lbl now">Оконная: 4 строки → 4, итог дописан рядом</div>
+      <table class="res"><tr><th>cat_id</th><th>amount</th><th>cat_total</th></tr><tr><td>1</td><td>5000</td><td>8200</td></tr><tr><td>1</td><td>3200</td><td>8200</td></tr><tr><td>2</td><td>7800</td><td>7800</td></tr><tr><td>3</td><td>1200</td><td>1200</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> ни одна строка не исчезла — у каждой просто появился новый столбец с итогом «её» группы. <span class="c">OVER</span> = «поверх» строк, <span class="c">PARTITION BY cat_id</span> = «окно — строки этого же кота». Зачем: теперь в одной строке есть и заказ (5000), и база для сравнения (8200) — можно посчитать долю 5000/8200 = 61%.</div>
+
+    <h3 class="sub">ROW_NUMBER — раздаём номерки внутри группы</h3>
+    <div class="code">SELECT cat_id, amount,
+  ROW_NUMBER() OVER (PARTITION BY cat_id ORDER BY amount DESC) AS rn
+FROM orders;</div>
+    <div class="duo">
+      <div><div class="lbl now">Каждый кот получил свою нумерацию с 1</div>
+      <table class="res"><tr><th>cat_id</th><th>amount</th><th>rn</th></tr><tr><td>1</td><td>5000</td><td>1</td></tr><tr><td>1</td><td>3200</td><td>2</td></tr><tr><td>2</td><td>7800</td><td>1</td></tr><tr><td>3</td><td>1200</td><td>1</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> внутри каждого «окна» (кота) строки выстроились по amount от большего к меньшему (<span class="c">ORDER BY внутри OVER</span>) и получили номера 1, 2, 3... У следующего кота счёт начинается заново. Классика: «топ-1 заказ каждого кота» = оставить строки, где rn = 1. Родственники: <span class="c">RANK</span> при равных значениях пропускает номер (1,2,2,4), <span class="c">DENSE_RANK</span> — нет (1,2,2,3).</div>
+
+    <h3 class="sub">LAG — подглядываем в предыдущую строку</h3>
+    <div class="code">SELECT created_at, amount,
+  LAG(amount) OVER (ORDER BY created_at) AS prev_amount
+FROM orders;</div>
+    <div class="duo">
+      <div><div class="lbl now">У каждой строки — значение предыдущей</div>
+      <table class="res"><tr><th>created_at</th><th>amount</th><th>prev_amount</th></tr><tr><td>01-05</td><td>5000</td><td>NULL</td></tr><tr><td>01-07</td><td>3200</td><td>5000</td></tr><tr><td>01-10</td><td>7800</td><td>3200</td></tr><tr><td>02-01</td><td>1200</td><td>7800</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> строки выстроились по дате, и каждая «заглянула» на строку выше. У первой предыдущей нет → NULL. Теперь легко посчитать «на сколько изменился заказ»: amount − prev_amount. <span class="c">LEAD</span> — то же, но заглядывает вниз.</div>
+
+    <h3 class="sub">Нарастающий итог</h3>
+    <div class="code">SELECT created_at, amount,
+  SUM(amount) OVER (ORDER BY created_at) AS running_total
+FROM orders;</div>
+    <div class="duo">
+      <div><div class="lbl now">Сумма накапливается сверху вниз</div>
+      <table class="res"><tr><th>created_at</th><th>amount</th><th>running_total</th></tr><tr><td>01-05</td><td>5000</td><td>5000</td></tr><tr><td>01-07</td><td>3200</td><td>8200</td></tr><tr><td>01-10</td><td>7800</td><td>16000</td></tr><tr><td>02-01</td><td>1200</td><td>17200</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> когда внутри OVER есть ORDER BY, а PARTITION нет — окно каждой строки это «все строки от начала до меня». Поэтому сумма растёт с каждой строкой. Это «нарастающим итогом» из финансовых отчётов.</div>
+
+    <div class="bubble cat">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#4A4A55"/><polygon points="26,38 22,10 46,32" fill="#4A4A55"/><polygon points="74,38 78,10 54,32" fill="#4A4A55"/><circle cx="40" cy="52" r="4" fill="#FFD700"/><circle cx="60" cy="52" r="4" fill="#FFD700"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/><path d="M50 65 Q45 71 39 68" stroke="#FFD700" stroke-width="1.5" fill="none"/><path d="M50 65 Q55 71 61 68" stroke="#FFD700" stroke-width="1.5" fill="none"/></svg>
+      <div><div class="who">Чёрный кот Оконик подводит итог:</div>
+      <div class="txt">Запомни одной фразой: GROUP BY схлопывает строки в итоги, оконная функция дописывает итог рядом с каждой строкой. Как кот, который пересчитал все миски, но ни одну не тронул. Это спрашивают на каждом собеседовании — теперь ты готова.</div></div>
+    </div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 9. Частые ошибки — и что они значат</summary>
+    <table>
+      <tr><th>Ошибка</th><th>Причина</th></tr>
+      <tr><td><span class="c">column must appear in the GROUP BY clause</span></td><td>столбец в SELECT не в GROUP BY и не в агрегате (глава 3)</td></tr>
+      <tr><td><span class="c">syntax error at or near ...</span></td><td>опечатка рядом с указанным словом: запятая, кавычка, скобка</td></tr>
+      <tr><td><span class="c">relation "имя" does not exist</span></td><td>опечатка в имени таблицы</td></tr>
+      <tr><td>Пустой результат, хотя данные есть</td><td>слишком строгий WHERE; проверь регистр текста ('Paid' ≠ 'paid') и NULL-ы</td></tr>
+      <tr><td>Строк стало больше после JOIN</td><td>у строки из левой таблицы несколько пар справа — это нормально, но проверь, ожидала ли ты этого (глава 6)</td></tr>
+    </table>
+  </details>
+
+  <details class="ch">
+    <summary>❤ Шпаргалка по SQL</summary>
+    <table class="cheat">
+      <tr><th>Задача</th><th>Конструкция</th></tr>
+      <tr><td>Выбрать столбцы</td><td><span class="c">SELECT a, b FROM t</span></td></tr>
+      <tr><td>Переименовать</td><td><span class="c">SELECT a AS новое_имя</span></td></tr>
+      <tr><td>Фильтр строк</td><td><span class="c">WHERE условие</span></td></tr>
+      <tr><td>Категории на лету</td><td><span class="c">CASE WHEN ... THEN ... ELSE ... END</span></td></tr>
+      <tr><td>Заменить NULL</td><td><span class="c">COALESCE(col, 0)</span></td></tr>
+      <tr><td>Итоги по группам</td><td><span class="c">GROUP BY col</span> + SUM/COUNT/AVG</td></tr>
+      <tr><td>Уникальные</td><td><span class="c">COUNT(DISTINCT col)</span></td></tr>
+      <tr><td>Фильтр групп</td><td><span class="c">HAVING SUM(col) &gt; x</span></td></tr>
+      <tr><td>Склеить таблицы</td><td><span class="c">LEFT JOIN t2 ON a.id = b.id</span></td></tr>
+      <tr><td>Временная таблица</td><td><span class="c">WITH name AS (SELECT ...)</span></td></tr>
+      <tr><td>Итог рядом со строкой</td><td><span class="c">SUM(x) OVER (PARTITION BY g)</span></td></tr>
+      <tr><td>Номер в группе</td><td><span class="c">ROW_NUMBER() OVER (PARTITION BY g ORDER BY y)</span></td></tr>
+      <tr><td>Сосед сверху</td><td><span class="c">LAG(col) OVER (ORDER BY y)</span></td></tr>
+      <tr><td>Нарастающий итог</td><td><span class="c">SUM(col) OVER (ORDER BY y)</span></td></tr>
+      <tr><td>Месяц из даты</td><td><span class="c">EXTRACT(MONTH FROM d)</span></td></tr>
+    </table>
+  </details>
+</section>
+
+<div class="pawline">🐾 🐾 🐾</div>
+
+<!-- ============ PYTHON ============ -->
+<section id="py">
+  <div class="eyebrow ho">Часть II</div>
+  <h2 class="sec">Python — когда SQL уже мало</h2>
+
+  <div class="bubble snake">
+    <svg viewBox="0 0 100 100"><path d="M20 80 Q30 40 55 55 Q75 68 62 78 Q50 84 55 65" stroke="#7BB661" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="56" cy="52" r="12" fill="#7BB661"/><circle cx="52" cy="49" r="2" fill="#2E2A3B"/><circle cx="61" cy="49" r="2" fill="#2E2A3B"/><path d="M52 56 Q56 59 60 56" stroke="#2E2A3B" stroke-width="1.4" fill="none"/><path d="M66 52 L74 50 L70 55 Z" fill="#E8618C"/></svg>
+    <div><div class="who">Змейка Пандас шипит дружелюбно:</div>
+    <div class="txt">Пшшш-привет! Python нужен аналитику для того, что неудобно в SQL: склеить 10 Excel-файлов, почистить грязные данные, автоматизировать отчёт. Открой <a href="https://colab.research.google.com" target="_blank" rel="noopener">Google Colab</a> — Python в браузере, без установки. Код в ячейке запускается по Shift+Enter.</div></div>
+  </div>
+
+  <details class="ch" open>
+    <summary>Глава 1. Самые основы</summary>
+    <h3 class="sub">Переменные — коробочки с данными</h3>
+    <div class="code">name = "Барсик"      <span class="cmt"># текст (str)</span>
+age = 3              <span class="cmt"># целое (int)</span>
+fluff = 4.5          <span class="cmt"># дробное (float)</span>
+is_hungry = True     <span class="cmt"># да/нет (bool)</span>
+print(name, age)     <span class="cmt"># напечатает: Барсик 3</span></div>
+    <div class="why"><b>Что произошло:</b> знак <span class="c">=</span> — не «равно», а «положи значение в коробочку с таким именем». Дальше по имени коробочки достаём содержимое.</div>
+    <h3 class="sub">Списки и словари</h3>
+    <div class="code">cats = ["Барсик", "Мурка", "Пушок"]  <span class="cmt"># список — как строка в Excel</span>
+print(cats[0])       <span class="cmt"># Барсик — счёт с НУЛЯ, не с единицы!</span>
+print(len(cats))     <span class="cmt"># 3 — сколько элементов</span>
+
+cat = {"name": "Барсик", "city": "Питер"}  <span class="cmt"># словарь: ключ → значение</span>
+print(cat["city"])   <span class="cmt"># Питер — достаём по ключу</span></div>
+    <h3 class="sub">Условия и циклы</h3>
+    <div class="code">amount = 5000
+if amount &gt;= 5000:       <span class="cmt"># это CASE WHEN из SQL, только в Python</span>
+    print("крупный")
+elif amount &gt;= 2000:
+    print("средний")
+else:
+    print("мелкий")
+<span class="cmt"># напечатает: крупный</span>
+
+for cat in cats:          <span class="cmt"># «для каждого элемента сделай...»</span>
+    print("Привет,", cat)
+<span class="cmt"># Привет, Барсик / Привет, Мурка / Привет, Пушок</span></div>
+    <div class="warn"><b>Про отступы:</b> вложенность в Python — это отступы (4 пробела). Всё, что с отступом после if/for — «внутри» него. Забыла отступ — <span class="c">IndentationError</span>. Colab делает их сам, просто не удаляй.</div>
+    <h3 class="sub">Функции — свои команды</h3>
+    <div class="code">def order_size(amount):        <span class="cmt"># def = «объявляю новую команду»</span>
+    if amount &gt;= 5000:
+        return "крупный"        <span class="cmt"># return = «вот ответ»</span>
+    return "мелкий"
+
+print(order_size(7800))   <span class="cmt"># крупный</span></div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 2. Pandas — Excel на стероидах</summary>
+    <p>Главная библиотека аналитика. Её объект — <b>DataFrame</b> — это таблица, точно как в SQL.</p>
+    <div class="code">import pandas as pd    <span class="cmt"># подключаем (1 раз сверху); pd — общепринятая кличка</span>
+
+orders = pd.DataFrame({
+    "cat_id": [1, 1, 2, 3],
+    "amount": [5000, 3200, 7800, 1200],
+    "status": ["paid", "cancelled", "paid", "paid"]
+})
+
+orders.head()      <span class="cmt"># первые 5 строк — всегда начинай с этого</span>
+orders.info()      <span class="cmt"># типы столбцов и пропуски</span>
+orders.describe()  <span class="cmt"># среднее/мин/макс по числам</span></div>
+    <h3 class="sub">Файлы</h3>
+    <div class="code">df = pd.read_csv("orders.csv")       <span class="cmt"># прочитать CSV</span>
+df = pd.read_excel("orders.xlsx")    <span class="cmt"># прочитать Excel</span>
+df.to_excel("result.xlsx", index=False)  <span class="cmt"># сохранить</span></div>
+    <p>В Colab файл сначала загружается через иконку папки слева (перетащить мышкой).</p>
+    <h3 class="sub">Фильтр — аналог WHERE</h3>
+    <div class="code">paid = orders[orders["status"] == "paid"]</div>
+    <div class="duo">
+      <div><div class="lbl was">Было: 4 строки</div></div>
+      <div><div class="lbl now">Стало: 3 строки (cancelled отпала)</div>
+      <table class="res"><tr><th>cat_id</th><th>amount</th><th>status</th></tr><tr><td>1</td><td>5000</td><td>paid</td></tr><tr><td>2</td><td>7800</td><td>paid</td></tr><tr><td>3</td><td>1200</td><td>paid</td></tr></table></div>
+    </div>
+    <div class="why"><b>Что произошло:</b> внутри скобок — условие на каждую строку (True/False), снаружи df оставляет только строки с True. Читается: «orders, где status равен paid».</div>
+    <div class="warn"><b>Ловушка:</b> «и» — это <span class="c">&amp;</span>, «или» — <span class="c">|</span>, каждое условие в круглых скобках: <span class="c">df[(усл1) &amp; (усл2)]</span>. Написать <span class="c">and</span> — ошибка.</div>
+    <h3 class="sub">Группировка — аналог GROUP BY</h3>
+    <div class="code">orders.groupby("cat_id")["amount"].sum()</div>
+    <div class="duo">
+      <div><div class="lbl now">Результат: итог по каждому коту</div>
+      <table class="res"><tr><th>cat_id</th><th>amount</th></tr><tr><td>1</td><td>8200</td></tr><tr><td>2</td><td>7800</td></tr><tr><td>3</td><td>1200</td></tr></table></div>
+    </div>
+    <div class="why"><b>Читается по кусочкам:</b> groupby("cat_id") — разложи по кучкам; ["amount"] — возьми этот столбец; .sum() — просуммируй в каждой кучке. Ровно GROUP BY + SUM из SQL.</div>
+    <h3 class="sub">JOIN, новый столбец, сводная</h3>
+    <div class="code"><span class="cmt"># LEFT JOIN</span>
+cats = pd.DataFrame({"id": [1,2,3], "name": ["Барсик","Мурка","Пушок"]})
+result = orders.merge(cats, left_on="cat_id", right_on="id", how="left")
+
+<span class="cmt"># CASE WHEN → новый столбец</span>
+orders["size"] = orders["amount"].apply(
+    lambda x: "крупный" if x &gt;= 5000 else "мелкий")
+
+<span class="cmt"># сводная как в Excel</span>
+pd.pivot_table(orders, values="amount", index="cat_id",
+               columns="status", aggfunc="sum", fill_value=0)</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 3. Мостик SQL → Pandas</summary>
+    <p>Ты уже знаешь SQL — значит, знаешь и pandas, просто другими словами:</p>
+    <table>
+      <tr><th>SQL</th><th>Pandas</th></tr>
+      <tr><td><span class="c">SELECT a, b FROM t</span></td><td><span class="c">df[["a", "b"]]</span></td></tr>
+      <tr><td><span class="c">WHERE x &gt; 5</span></td><td><span class="c">df[df["x"] &gt; 5]</span></td></tr>
+      <tr><td><span class="c">GROUP BY a + SUM(b)</span></td><td><span class="c">df.groupby("a")["b"].sum()</span></td></tr>
+      <tr><td><span class="c">ORDER BY b DESC</span></td><td><span class="c">df.sort_values("b", ascending=False)</span></td></tr>
+      <tr><td><span class="c">LEFT JOIN</span></td><td><span class="c">df1.merge(df2, how="left", on="id")</span></td></tr>
+      <tr><td><span class="c">CASE WHEN</span></td><td><span class="c">apply(lambda ...)</span></td></tr>
+      <tr><td><span class="c">DISTINCT</span></td><td><span class="c">df["col"].unique()</span></td></tr>
+      <tr><td><span class="c">COUNT(*)</span></td><td><span class="c">len(df)</span></td></tr>
+    </table>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 4. Первый график + как читать ошибки</summary>
+    <div class="code">import matplotlib.pyplot as plt
+
+totals = orders.groupby("cat_id")["amount"].sum()
+totals.plot(kind="bar", color="#6F4FC3", title="Сумма заказов по котам")
+plt.show()</div>
+    <div class="why"><b>Что произошло:</b> сначала посчитали итоги (как в главе 2), потом .plot() нарисовал их столбцами. <span class="c">kind="bar"</span> — столбцы, <span class="c">"line"</span> — линия. График появится прямо под ячейкой Colab.</div>
+    <div class="bubble snake">
+      <svg viewBox="0 0 100 100"><path d="M20 80 Q30 40 55 55 Q75 68 62 78 Q50 84 55 65" stroke="#7BB661" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="56" cy="52" r="12" fill="#7BB661"/><circle cx="52" cy="49" r="2" fill="#2E2A3B"/><circle cx="61" cy="49" r="2" fill="#2E2A3B"/><path d="M52 56 Q56 59 60 56" stroke="#2E2A3B" stroke-width="1.4" fill="none"/></svg>
+      <div><div class="who">Змейка Пандас про ошибки:</div>
+      <div class="txt">Ошибки читай СНИЗУ вверх: последняя строка — ЧТО случилось (<span class="c">KeyError: 'amount'</span> = нет такого столбца, проверь опечатку), строки выше — ГДЕ. Гуглить текст ошибки — не стыдно, так делают все, даже сеньоры.</div></div>
+    </div>
+  </details>
+
+  <details class="ch">
+    <summary>🐍 Шпаргалка по Python/Pandas</summary>
+    <table class="cheat">
+      <tr><th>Задача</th><th>Код</th></tr>
+      <tr><td>Подключить pandas</td><td><span class="c">import pandas as pd</span></td></tr>
+      <tr><td>Прочитать файл</td><td><span class="c">pd.read_csv() / pd.read_excel()</span></td></tr>
+      <tr><td>Посмотреть данные</td><td><span class="c">df.head() / df.info() / df.describe()</span></td></tr>
+      <tr><td>Фильтр</td><td><span class="c">df[df["col"] &gt; 5]</span></td></tr>
+      <tr><td>Несколько условий</td><td><span class="c">df[(усл1) &amp; (усл2)]</span></td></tr>
+      <tr><td>Группировка</td><td><span class="c">df.groupby("a")["b"].sum()</span></td></tr>
+      <tr><td>Сортировка</td><td><span class="c">df.sort_values("col", ascending=False)</span></td></tr>
+      <tr><td>JOIN</td><td><span class="c">df1.merge(df2, how="left", on="id")</span></td></tr>
+      <tr><td>Сводная</td><td><span class="c">pd.pivot_table(df, values=, index=, aggfunc=)</span></td></tr>
+      <tr><td>Пропуски</td><td><span class="c">df.isna().sum() / df.fillna(0)</span></td></tr>
+      <tr><td>Дубликаты</td><td><span class="c">df.drop_duplicates()</span></td></tr>
+      <tr><td>График</td><td><span class="c">df.plot(kind="bar")</span></td></tr>
+      <tr><td>Сохранить</td><td><span class="c">df.to_excel("out.xlsx", index=False)</span></td></tr>
+    </table>
+  </details>
+</section>
+
+<div class="pawline">🐾 🐾 🐾</div>
+
+<!-- ============ POWER BI ============ -->
+<section id="pbi">
+  <div class="eyebrow te">Часть III</div>
+  <h2 class="sec">Power BI — рисуем данные красиво</h2>
+
+  <div class="bubble cat">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#fff" stroke="#E0E0E0"/><polygon points="26,38 22,10 46,32" fill="#fff" stroke="#E0E0E0"/><polygon points="74,38 78,10 54,32" fill="#fff" stroke="#E0E0E0"/><circle cx="40" cy="52" r="4" fill="#5BA4E6"/><circle cx="60" cy="52" r="4" fill="#5BA4E6"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/><path d="M50 65 Q45 71 39 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 65 Q55 71 61 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+    <div><div class="who">Кошка Дашборда мурлычет:</div>
+    <div class="txt">Power BI — место, где твои данные надевают красивое и идут на встречу с руководством. Путь всегда один: подключил → почистил в Power Query → связал таблицы → написал меры DAX → собрал визуал. Идём по кликам.</div></div>
+  </div>
+
+  <details class="ch" open>
+    <summary>Глава 1–2. Установка и подключение данных</summary>
+    <div class="step"><b>Шаг 1.</b> Скачай бесплатный Power BI Desktop (кнопка в «Песочницах» ниже). Только Windows.</div>
+    <div class="step"><b>Шаг 2.</b> Слева три иконки: <b>Отчёт</b> (графики), <b>Данные</b> (таблицы), <b>Модель</b> (связи).</div>
+    <div class="step"><b>Шаг 3.</b> Главная → <b>Получить данные</b> → «Книга Excel» или «Текст/CSV» → выбери файл → галочки на нужных листах.</div>
+    <div class="step"><b>Шаг 4.</b> Нажми <b>«Преобразовать данные»</b> (НЕ «Загрузить»!) — попадёшь в Power Query.</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 3. Power Query — уборка данных</summary>
+    <ul>
+      <li><b>Типы данных:</b> клик по иконке слева от имени столбца (123 / ABC / календарик) → правильный тип. Числа должны быть числами, даты — датами, иначе не посчитается!</li>
+      <li><b>Убрать строки:</b> стрелка-фильтр на столбце → снять галочки (например, cancelled).</li>
+      <li><b>Merge (JOIN):</b> Главная → Объединить запросы → вторая таблица + общий столбец. Это тот же LEFT JOIN из части I, только мышкой.</li>
+      <li><b>Append:</b> Главная → Добавить запросы — склеить таблицы одну ПОД другой (данные за разные месяцы из разных файлов).</li>
+    </ul>
+    <p>Все шаги пишутся справа в «Применённые шаги» — любой можно поправить. Закончила — <b>«Закрыть и применить»</b>.</p>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 4. Связи между таблицами</summary>
+    <div class="step"><b>Шаг 1.</b> Окно <b>Модель</b> (третья иконка слева).</div>
+    <div class="step"><b>Шаг 2.</b> Перетащи столбец <span class="c">cat_id</span> из orders на <span class="c">id</span> в cats. Появилась линия — связь готова.</div>
+    <div class="step"><b>Шаг 3.</b> Проверь подписи на линии: «1» со стороны cats, «*» со стороны orders — один кот, много заказов.</div>
+    <div class="why"><b>Зачем связи:</b> это тот же JOIN, но заданный один раз — теперь любой график сможет соединять «имя кота» и «сумму заказа» автоматически. <b>Звёздная схема:</b> в центре таблица фактов (orders — числа), вокруг измерения (cats, календарь), связи — лучами от центра.</div>
+  </details>
+
+  <details class="ch" open>
+    <summary>Глава 5. Первый график — по кликам! 🎨</summary>
+    <div class="step"><b>Шаг 1.</b> Окно <b>Отчёт</b>. Справа две панели: <b>Визуализации</b> (иконки графиков) и <b>Данные</b> (твои таблицы с полями).</div>
+    <div class="step"><b>Шаг 2.</b> Кликни иконку <b>гистограммы</b> (столбики) — на холсте появится пустая заготовка.</div>
+    <div class="step"><b>Шаг 3.</b> В панели Данные раскрой cats и перетащи поле <span class="c">name</span> в ячейку <b>«Ось X»</b> (под иконками визуалов).</div>
+    <div class="step"><b>Шаг 4.</b> Раскрой orders и перетащи <span class="c">amount</span> в <b>«Ось Y»</b>. Power BI сам просуммирует — график готов: столбик на каждого кота!</div>
+    <div class="step"><b>Шаг 5.</b> Добавь <b>Срез</b> (иконка воронки) → перетащи в него <span class="c">status</span> → кликай «paid», и весь дашборд перестраивается. Это кросс-фильтрация.</div>
+    <div class="step"><b>Шаг 6.</b> Кисточка «Формат» → цвета, подписи данных, заголовок. Не увлекайся: 2–3 цвета на весь дашборд.</div>
+    <h3 class="sub">Какой график когда</h3>
+    <table>
+      <tr><th>Хочу показать</th><th>Визуал</th></tr>
+      <tr><td>Одно главное число</td><td>Карточка (Card)</td></tr>
+      <tr><td>Сравнить категории</td><td>Столбчатая — в 80% случаев она</td></tr>
+      <tr><td>Динамику во времени</td><td>Линейный график</td></tr>
+      <tr><td>Точные цифры</td><td>Таблица / Матрица</td></tr>
+      <tr><td>Доли целого</td><td>Круговая — но люди плохо сравнивают углы, чаще лучше столбцы</td></tr>
+    </table>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 6. DAX — формулы, которые думают</summary>
+    <div class="bubble cat">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="30" fill="#F9A03F"/><polygon points="26,38 22,10 46,32" fill="#F9A03F"/><polygon points="74,38 78,10 54,32" fill="#F9A03F"/><circle cx="40" cy="52" r="4" fill="#2E2A3B"/><circle cx="60" cy="52" r="4" fill="#2E2A3B"/><polygon points="50,60 46,65 54,65" fill="#FF8FAB"/><path d="M50 65 Q45 71 39 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 65 Q55 71 61 68" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+      <div><div class="who">Кот Джойн объясняет на мисках:</div>
+      <div class="txt"><b>Вычисляемый столбец</b> — насыпал корм заранее во все миски: посчитан один раз, лежит в таблице. <b>Мера</b> — кот, который пересчитывает корм каждый раз при открытии шкафа: реагирует на фильтры и срезы. Кликнула «Питер» в срезе — мера пересчиталась только по питерским. Для сумм и средних почти всегда нужна мера!</div></div>
+    </div>
+    <div class="step"><b>Как создать меру:</b> правый клик на таблице в панели Данные → <b>«Создать меру»</b> → формула в строку сверху → Enter. Мера появится в списке полей со значком калькулятора.</div>
+    <div class="code">Общая сумма = SUM(orders[amount])
+
+Сумма оплаченных = CALCULATE(SUM(orders[amount]), orders[status] = "paid")
+
+Продажи год назад = CALCULATE([Общая сумма], SAMEPERIODLASTYEAR(dates[Date]))</div>
+    <div class="why"><b>Про CALCULATE:</b> это королева DAX — она меняет условия, при которых считается формула. «Посчитай сумму, но только по оплаченным» — независимо от того, что выбрано на дашборде. Для сравнения периодов (год к году) нужна отдельная таблица дат, связанная с данными.</div>
+  </details>
+
+  <details class="ch">
+    <summary>Глава 7 + шпаргалка Power BI</summary>
+    <p><b>Публикация:</b> кнопка «Опубликовать» → отчёт в Power BI Service (облако) → делись ссылкой, настраивай автообновление, открывай с телефона.</p>
+    <table class="cheat">
+      <tr><th>Задача</th><th>Где / как</th></tr>
+      <tr><td>Подключить данные</td><td>Главная → Получить данные</td></tr>
+      <tr><td>Почистить</td><td>Преобразовать данные (Power Query)</td></tr>
+      <tr><td>JOIN мышкой</td><td>Power Query → Объединить запросы</td></tr>
+      <tr><td>Связать таблицы</td><td>Модель → перетащить столбец на столбец</td></tr>
+      <tr><td>Построить график</td><td>Отчёт → иконка визуала → поля в Ось X/Y</td></tr>
+      <tr><td>Фильтр для пользователя</td><td>Визуал «Срез»</td></tr>
+      <tr><td>Создать меру</td><td>Правый клик на таблице → Создать меру</td></tr>
+      <tr><td>Сумма с фильтрами</td><td><span class="c">М = SUM(t[col])</span></td></tr>
+      <tr><td>С условием</td><td><span class="c">CALCULATE(SUM(t[col]), t[c]="x")</span></td></tr>
+      <tr><td>Прошлый год</td><td><span class="c">SAMEPERIODLASTYEAR(dates[Date])</span></td></tr>
+      <tr><td>Поделиться</td><td>Опубликовать → Power BI Service</td></tr>
+    </table>
+  </details>
+</section>
+
+<div class="pawline">🐾 🐾 🐾</div>
+
+<!-- ============ SANDBOXES ============ -->
+<section id="sand">
+  <div class="eyebrow pi">Практика</div>
+  <h2 class="sec">Песочницы и тренажёры — всё бесплатно</h2>
+  <div class="sandboxes">
+    <a class="sand s-pu" href="https://sqliteonline.com" target="_blank" rel="noopener">
+      <b>SQLite Online</b>
+      <span>SQL прямо в браузере, без установки. Сюда вставляешь учебную базу из Части 0.</span>
+      <span class="go">Открыть →</span>
+    </a>
+    <a class="sand s-pu" href="https://sql-ex.ru" target="_blank" rel="noopener">
+      <b>SQL-EX.ru</b>
+      <span>Русскоязычный тренажёр с сотнями задач по возрастающей сложности. Классика.</span>
+      <span class="go">Решать задачи →</span>
+    </a>
+    <a class="sand s-pu" href="https://leetcode.com/studyplan/top-sql-50/" target="_blank" rel="noopener">
+      <b>LeetCode SQL 50</b>
+      <span>Бесплатная подборка из 50 задач — много на оконные функции, отлично перед собеседованием.</span>
+      <span class="go">Тренироваться →</span>
+    </a>
+    <a class="sand s-ho" href="https://colab.research.google.com" target="_blank" rel="noopener">
+      <b>Google Colab</b>
+      <span>Python в браузере: бесплатно, без установки. Создай блокнот и пиши код по Части II.</span>
+      <span class="go">Открыть блокнот →</span>
+    </a>
+    <a class="sand s-ho" href="https://stepik.org/course/58852" target="_blank" rel="noopener">
+      <b>Stepik: Python для начинающих</b>
+      <span>Бесплатный русскоязычный курс с автопроверкой задач — дополнение к Части II.</span>
+      <span class="go">Пройти курс →</span>
+    </a>
+    <a class="sand s-te" href="https://www.microsoft.com/ru-ru/download/details.aspx?id=58494" target="_blank" rel="noopener">
+      <b>Power BI Desktop</b>
+      <span>Официальная бесплатная программа от Microsoft. Только Windows.</span>
+      <span class="go">Скачать →</span>
+    </a>
+    <a class="sand s-te" href="https://learn.microsoft.com/ru-ru/training/powerplatform/power-bi" target="_blank" rel="noopener">
+      <b>Microsoft Learn: Power BI</b>
+      <span>Бесплатные официальные модули на русском, с сертификатами о прохождении.</span>
+      <span class="go">Учиться →</span>
+    </a>
+    <a class="sand s-pi" href="https://www.kaggle.com/datasets" target="_blank" rel="noopener">
+      <b>Kaggle Datasets</b>
+      <span>Тысячи открытых датасетов — тренируйся строить отчёты на настоящих данных.</span>
+      <span class="go">Выбрать датасет →</span>
+    </a>
+  </div>
+
+  <div class="bubble otter" style="margin-top:28px">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="26" fill="#8B6647"/><ellipse cx="50" cy="62" rx="16" ry="13" fill="#C9A87F"/><circle cx="30" cy="34" r="7" fill="#8B6647"/><circle cx="70" cy="34" r="7" fill="#8B6647"/><path d="M37 46 Q41 43 45 46" stroke="#2E2A3B" stroke-width="2" fill="none"/><path d="M55 46 Q59 43 63 46" stroke="#2E2A3B" stroke-width="2" fill="none"/><ellipse cx="50" cy="58" rx="4.5" ry="3.5" fill="#2E2A3B"/><path d="M50 61 Q46 67 41 64" stroke="#2E2A3B" stroke-width="1.5" fill="none"/><path d="M50 61 Q54 67 59 64" stroke="#2E2A3B" stroke-width="1.5" fill="none"/></svg>
+    <div><div class="who">Выдра Куэри на прощание:</div>
+    <div class="txt">Не спеши и не сравнивай себя с другими — каждый плывёт со своей скоростью, и это нормально. Ошибки — не провал, а часть пути: даже сеньоры гуглят «как сделать JOIN» чаще, чем признаются. Ты уже сделала самое сложное — начала. Остальное — дело лапок. Мы в тебя верим. 💜</div></div>
+  </div>
+</section>
+
+<div class="footer">Хвостатая аналитика • Сделано с мурчанием • Все персонажи нарисованы вручную и не пострадали</div>
+
+</body>
+</html>
